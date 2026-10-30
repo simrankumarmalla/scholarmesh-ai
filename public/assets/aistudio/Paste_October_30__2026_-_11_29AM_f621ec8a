@@ -1,0 +1,680 @@
+MASTER PROMPT: "ScholarMesh AI" — Multi-Source Research Synthesis & Evidence Discovery Platform
+1. Header & System Persona Role
+You are an elite Principal Full-Stack Engineer, AI Systems Architect, and Product Designer. Your task is to architect and build ScholarMesh AI, a complete, production-ready, full-stack web application designed for the AI for Research & Knowledge Discovery challenge.
+
+You must write 100% complete, modular, runnable, and bug-free code across the entire stack. Never use // TODO, // implement later, mock placeholders, or truncated code blocks. Every database table, API endpoint, Zod validator, Multer upload handler, AI prompt, and React component must be fully implemented from start to finish.
+
+2. Core Mission Directive
+Researchers, academic analysts, R&D teams, and policy professionals spend up to 60% of their workflow manually sifting through fragmented PDFs, raw text notes, and web articles—struggling to cross-reference claims, identify contradictions, evaluate methodology quality, and synthesize evidence-backed conclusions.
+
+Your Mission: Build ScholarMesh AI, an end-to-end AI-powered Research & Knowledge Discovery platform that allows users to create dedicated Research Workspaces, ingest multi-modal research sources (uploaded PDFs/TXT/MD documents via Multer, raw literature notes, and abstract snippets), automatically extract structured knowledge claims, perform Cross-Source Synthesis & Contradiction Detection, build an interactive Evidence Matrix, and query their corpus using a Citation-Backed RAG Research Copilot powered by the official @google/genai SDK.
+
+3. Product Goal
+Deliver a cohesive, responsive, dark-mode-first SaaS web application where authenticated researchers can:
+
+Organize inquiries into structured Research Workspaces categorized by domain and research methodology.
+
+Upload documents (PDF, TXT, MD) via Multer or paste raw source abstracts/notes into a workspace corpus.
+
+Automatically analyze each ingested source with Google Gemini to extract an executive summary, key claims list, methodology classification, credibility/rigor score (0–100), and extracted topic keywords.
+
+Run a Cross-Source Knowledge Synthesis Engine that compares 2 or more sources simultaneously to uncover consensus themes, direct empirical contradictions, research gaps, and actionable decision recommendations.
+
+Interact with a Grounded Research Copilot that answers complex research questions strictly grounded in the workspace's uploaded sources with inline source citations.
+
+4. Mandatory Features
+Full JWT + bcrypt Authentication Flow: Register, Login, Logout, Protected Routes, and persistent user session state, plus a 1-click "Try Demo Researcher Account" login.
+
+Research Workspace Management: Create, view, filter, search, and delete domain-specific Research Workspaces with custom research questions and hypothesis tracking.
+
+Multi-Format Source Ingestion (Multer + Text Parser):
+
+Upload .pdf, .txt, or .md files (parsed server-side via pdf-parse / UTF-8 buffer extraction) or submit raw text/DOI abstracts.
+
+Automatic AI extraction upon upload: generates executive summary, atomic claims list, methodology evaluation, credibility/rigor score (0–100), and topic keywords.
+
+AI Cross-Source Synthesis & Contradiction Matrix:
+
+Select 2+ sources in a workspace and trigger a deep synthesis run.
+
+Generates: Executive Literature Review, Consensus Themes Matrix, Contradiction & Discrepancy Alerts, Identified Research Gaps, and Evidence-Based Decision Recommendations.
+
+Citation-Grounded Research Copilot (Chat):
+
+Contextual Q&A thread per workspace that passes indexed document summaries and extracted claims to Gemini and returns answers with strict `` citations and suggested follow-up questions.
+
+Knowledge Claim & Evidence Explorer:
+
+Interactive filterable view of all extracted atomic claims across all documents in a workspace, tagged by claim type (empirical_finding, statistic, methodology, limitation, hypothesis) and confidence rating.
+
+Exportable Synthesis Reports:
+
+One-click export of any AI Literature Review or Synthesis Report to clean Markdown (.md) or print-ready PDF view.
+
+5. Technology Requirements
+Frontend:
+
+React.js (v18+) with Vite
+
+React Router DOM (v6+) for client-side routing
+
+Tailwind CSS for high-contrast academic UI styling (slate-950 dark theme with indigo-500 and emerald-500 accents)
+
+Lucide React (lucide-react) for icons
+
+Axios for API calls with automatic JWT Authorization: Bearer <token> request interceptor
+
+Backend:
+
+Node.js + Express.js (REST API architecture)
+
+Authentication: jsonwebtoken (JWT) + bcryptjs for password hashing
+
+Validation: zod for strict request body, query, and AI response validation
+
+File Uploads: multer (memoryStorage with 10MB file size limit) + pdf-parse for PDF text extraction
+
+Security & Middleware: cors, helmet, express-rate-limit, dotenv
+
+Database:
+
+PostgreSQL (compatible with Replit Postgres, Supabase PostgreSQL, Neon, or Railway PostgreSQL) using pg (node-postgres connection pool)
+
+Artificial Intelligence:
+
+Official Google Gen AI SDK: @google/genai
+
+Model: gemini-2.5-flash
+
+Structured Outputs using responseMimeType: "application/json" and responseSchema
+
+Strict Requirement: GEMINI_API_KEY must ONLY exist in backend environment variables and never be exposed to the frontend.
+
+6. Application Pages (Routes)
+/ — Landing Page: Hero section demonstrating the AI Research & Knowledge Discovery workflow, interactive feature showcase, problem/solution overview, and CTAs to Sign Up or Log In.
+
+/login — Login Page: Email/password form with Zod validation, error feedback, and a "1-Click Demo Researcher Login" button.
+
+/register — Registration Page: Full name, institution/organization, research role, email, and password signup.
+
+/dashboard — Workspaces Dashboard (Protected): Overview metrics (Total Workspaces, Sources Analyzed, Atomic Claims Extracted, Syntheses Generated), domain filter pills, search bar, and grid of Research Workspaces.
+
+/workspaces/new — Create Workspace Page (Protected): Guided form to define workspace title, primary research question, working hypothesis, target domain, and default synthesis lens.
+
+/workspaces/:id — Workspace Command Center (Protected): Multi-tab research environment containing:
+
+Tab 1: Corpus & Source Upload (Drag-and-drop file uploader + raw text/abstract ingestion + "Load Sample Paper" button + source cards with AI Rigor Score badges).
+
+Tab 2: Claim & Evidence Explorer (Searchable and filterable matrix of all extracted atomic claims, statistics, and limitations across sources).
+
+Tab 3: Cross-Source Synthesis Studio (Select 2+ sources, pick a synthesis mode, trigger multi-document AI synthesis, and inspect Consensus vs. Contradictions, Research Gaps, and Decision Matrix).
+
+Tab 4: Grounded Research Copilot (Conversational RAG interface with clickable source citation cards and follow-up question chips).
+
+/saved-syntheses — Synthesis Library (Protected): Archive of all generated literature reviews and decision briefs across workspaces with one-click Markdown export.
+
+7. User Flow
+Onboarding: User registers an account or clicks "Use Demo Researcher Account" on /login -> receives JWT token -> redirected to /dashboard.
+
+Workspace Creation: User clicks "New Research Workspace" -> inputs title (e.g., "mRNA Delivery Lipid Nanoparticles: Efficacy vs. Hepatic Toxicity"), domain (Biomedical & Clinical Sciences), primary research question, and working hypothesis -> saved to PostgreSQL.
+
+Source Ingestion: Inside /workspaces/:id, user uploads 2–5 PDF/TXT research papers via Multer or pastes study abstracts (or clicks "Load Sample Study" to populate realistic papers immediately).
+
+Automated AI Indexing: Backend extracts text from the file or body, invokes Gemini with a strict JSON Schema to generate an executive summary, methodology critique, rigor score (0–100), topic keywords, and atomic claims, then stores everything in sources and extracted_claims tables.
+
+Knowledge Discovery & Synthesis: User navigates to Synthesis Studio, selects 2+ sources, chooses a synthesis lens (e.g., Systematic Literature Review or Contradiction & Bias Audit), and clicks "Run Cross-Source Synthesis".
+
+Insight Inspection: Gemini compares all selected sources and returns a structured JSON report displaying Consensus Themes, Direct Contradictions between studies, Unanswered Research Gaps, and an Evidence-Based Decision Matrix.
+
+Interactive Interrogation: User opens the Research Copilot tab and asks specific questions (e.g., "Where do these studies disagree on dosing thresholds and what sample sizes were used?"), receiving answers strictly grounded in the workspace corpus with source citations.
+
+8. Target Domains & Categorization
+Every Research Workspace must support categorization into the following 6 core knowledge domains:
+
+biomedical_clinical — Biomedical, Healthcare & Clinical Research
+
+ai_computer_science — Artificial Intelligence, Systems & Computer Science
+
+climate_sustainability — Climate Science, Energy & Environmental Policy
+
+economics_market — Macroeconomics, Financial Markets & Policy Intelligence
+
+legal_regulatory — Legal Precedent, Compliance & Regulatory Analysis
+
+social_behavioral — Social Sciences, Psychology & Public Policy
+
+9. Form & Advisory Configuration
+When creating a Workspace, ingesting a Source, or running a Synthesis job, enforce these structured configuration options:
+
+Research Methodology Lenses (synthesis_mode):
+
+systematic_review — Comprehensive synthesis of findings, methods, and sample rigor
+
+contradiction_audit — Focuses heavily on conflicting data points, methodological flaws, and opposing conclusions
+
+decision_brief — Translates research findings into executive policy/product recommendations with risk levels
+
+gap_analysis — Identifies unexplored variables, demographic blind spots, and future research directions
+
+Source Types (source_type):
+
+peer_reviewed_paper — Uploaded PDF / Academic Paper
+
+technical_report — Whitepaper / Industry Technical Report
+
+raw_field_notes — Researcher Lab Notes / Interview Transcripts
+
+web_article_abstract — Abstract / Literature Excerpt
+
+Claim Categories (claim_category):
+
+empirical_finding — Primary experimental or observational result
+
+statistic — Quantitative metric, p-value, effect size, or sample statistic
+
+methodology — Study design, control group setup, or analytical protocol
+
+limitation — Author-acknowledged or AI-detected study constraint/bias
+
+hypothesis — Theoretical proposition or untested claim
+
+10. Database Schema (Production SQL for PostgreSQL)
+Create an automatic database initialization script (server/src/db/init.sql executed automatically on server startup) with the following production PostgreSQL schema:
+
+SQL
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- 1. Users Table
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  full_name VARCHAR(120) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  institution VARCHAR(180) DEFAULT 'Independent Research Institute',
+  research_role VARCHAR(100) DEFAULT 'Principal Investigator',
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Research Workspaces Table
+CREATE TABLE IF NOT EXISTS workspaces (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(200) NOT NULL,
+  domain VARCHAR(60) NOT NULL,
+  research_question TEXT NOT NULL,
+  working_hypothesis TEXT,
+  default_synthesis_mode VARCHAR(50) DEFAULT 'systematic_review',
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Research Sources (Documents / Notes / Papers) Table
+CREATE TABLE IF NOT EXISTS sources (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  authors VARCHAR(255) DEFAULT 'Unknown Authors',
+  publication_year INT,
+  source_type VARCHAR(50) NOT NULL DEFAULT 'peer_reviewed_paper',
+  original_filename VARCHAR(255),
+  raw_content TEXT NOT NULL,
+  word_count INT DEFAULT 0,
+  ai_summary TEXT,
+  methodology_notes TEXT,
+  rigor_score INT DEFAULT 0 CHECK (rigor_score >= 0 AND rigor_score <= 100),
+  rigor_justification TEXT,
+  key_topics JSONB DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Extracted Atomic Claims & Evidence Table
+CREATE TABLE IF NOT EXISTS extracted_claims (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  source_id UUID NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+  workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  claim_text TEXT NOT NULL,
+  claim_category VARCHAR(50) NOT NULL,
+  supporting_quote TEXT,
+  confidence_level VARCHAR(20) DEFAULT 'high',
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Cross-Source Synthesis Reports Table
+CREATE TABLE IF NOT EXISTS synthesis_reports (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  synthesis_mode VARCHAR(50) NOT NULL,
+  source_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+  executive_summary TEXT NOT NULL,
+  consensus_themes JSONB NOT NULL DEFAULT '[]'::jsonb,
+  contradictions JSONB NOT NULL DEFAULT '[]'::jsonb,
+  research_gaps JSONB NOT NULL DEFAULT '[]'::jsonb,
+  decision_recommendations JSONB NOT NULL DEFAULT '[]'::jsonb,
+  overall_evidence_strength VARCHAR(40) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6. Workspace Copilot Chat Messages Table
+CREATE TABLE IF NOT EXISTS copilot_messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role VARCHAR(20) NOT NULL CHECK (role IN ('user', 'assistant')),
+  message_text TEXT NOT NULL,
+  citations JSONB DEFAULT '[]'::jsonb,
+  follow_up_questions JSONB DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_workspaces_user ON workspaces(user_id);
+CREATE INDEX IF NOT EXISTS idx_sources_workspace ON sources(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_claims_workspace ON extracted_claims(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_synthesis_workspace ON synthesis_reports(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_copilot_workspace ON copilot_messages(workspace_id);
+11. Row Level Security (RLS) / Data Isolation Rules
+Enforce strict tenant isolation across every SQL query and API handler:
+
+Every protected route must extract req.user.id from the verified JWT payload (never trust user_id sent in request body or query params).
+
+All SELECT, UPDATE, and DELETE queries on workspaces, sources, extracted_claims, synthesis_reports, and copilot_messages MUST include WHERE user_id = $1 (or verify workspace ownership first via SELECT id FROM workspaces WHERE id = $1 AND user_id = $2).
+
+If a user attempts to access, modify, or synthesize a workspace or source ID belonging to another user, immediately return 404 Not Found or 403 Forbidden.
+
+12. Backend API Routes
+All routes are prefixed with /api:
+
+Auth Routes (/api/auth)
+POST /api/auth/register — Validate input with Zod, hash password with bcrypt (10 salt rounds), create user, return { token, user }.
+
+POST /api/auth/login — Verify credentials, sign JWT (expiresIn: '7d'), return { token, user }.
+
+GET /api/auth/me — Protected route returning current user profile and aggregate dashboard counts.
+
+Workspace Routes (/api/workspaces)
+GET /api/workspaces — List all workspaces for req.user.id (supports ?domain= and ?search= query filters) with dynamic counts of source_count, claim_count, and synthesis_count.
+
+POST /api/workspaces — Validate with Zod and create a new research workspace.
+
+GET /api/workspaces/:id — Get full workspace details, including its ingested sources, extracted claims count, and synthesis reports.
+
+DELETE /api/workspaces/:id — Delete a workspace and cascade-delete associated records.
+
+Source Ingestion & AI Analysis Routes (/api/workspaces/:workspaceId/sources)
+POST /api/workspaces/:workspaceId/sources — Supports multipart/form-data (via Multer single file field document up to 10MB for .pdf, .txt, .md) OR JSON body (raw_content, title, authors, publication_year, source_type).
+
+Extracts text from the uploaded file buffer (pdf-parse for PDFs, buffer.toString('utf-8') for TXT/MD) or uses raw_content.
+
+Calls Gemini analyzeSourceDocument() to extract ai_summary, methodology_notes, rigor_score, rigor_justification, key_topics, and extracted_claims.
+
+Inserts the source into sources and bulk-inserts all extracted claims into extracted_claims inside a PostgreSQL transaction.
+
+GET /api/workspaces/:workspaceId/sources — List all ingested sources in the workspace ordered by created_at DESC.
+
+DELETE /api/workspaces/:workspaceId/sources/:sourceId — Remove a source and its associated claims.
+
+Claims Explorer Route (/api/workspaces/:workspaceId/claims)
+GET /api/workspaces/:workspaceId/claims — Retrieve all extracted claims for a workspace joined with sources.title, sources.authors, and sources.rigor_score, filterable by ?category=, ?confidence=, and ?search=.
+
+AI Cross-Source Synthesis Routes (/api/workspaces/:workspaceId/synthesize)
+POST /api/workspaces/:workspaceId/synthesize — Accepts { source_ids: string[], synthesis_mode: string, title?: string }. Verifies at least 2 sources belong to the workspace, retrieves their summaries, metadata, and extracted claims, calls Gemini generateCrossSourceSynthesis(), saves the structured report to synthesis_reports, and returns the saved report.
+
+GET /api/workspaces/:workspaceId/syntheses — List all synthesis reports for the workspace.
+
+GET /api/syntheses — List all synthesis reports across all workspaces for the logged-in user.
+
+Grounded Research Copilot Routes (/api/workspaces/:workspaceId/copilot)
+GET /api/workspaces/:workspaceId/copilot — Fetch conversation history for the workspace.
+
+POST /api/workspaces/:workspaceId/copilot — Accepts { question: string }. Retrieves all workspace sources & extracted claims as grounded context, calls Gemini askResearchCopilot(), saves both the user message and assistant response (with structured citations and follow-up prompts) in copilot_messages, and returns the response.
+
+13. Gemini SDK Setup & Server-Side Security
+Install the official Google Gen AI SDK: npm install @google/genai
+
+Initialize the client strictly on the backend (server/src/services/geminiService.js):
+
+JavaScript
+import { GoogleGenAI, Type } from "@google/genai";
+import dotenv from "dotenv";
+dotenv.config();
+
+if (!process.env.GEMINI_API_KEY) {
+  console.warn("WARNING: GEMINI_API_KEY is not set in environment variables.");
+}
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const MODEL_NAME = "gemini-2.5-flash";
+Never expose GEMINI_API_KEY in any VITE_* frontend variable or client code.
+
+Include a clean, deterministic fallback parser in geminiService.js ONLY if process.env.GEMINI_API_KEY is missing during local evaluation, while always executing live ai.models.generateContent calls when GEMINI_API_KEY is present.
+
+14. AI System Prompt
+Use the following overarching System Instruction across all Gemini calls in geminiService.js:
+
+Plaintext
+You are ScholarMesh AI, a Principal Scientific Literature Analyst, Epistemological Auditor, and Knowledge Discovery Engine.
+Your objective is to accelerate rigorous research workflows by extracting verifiable empirical claims, evaluating methodological quality, uncovering cross-document contradictions, identifying literature gaps, and enabling evidence-based decision-making.
+
+Core Operating Rules:
+1. GROUNDED TRUTH ONLY: Base every claim, synthesis, and answer strictly on the provided source text(s). Never hallucinate external citations or fabricate statistics.
+2. METHODOLOGICAL RIGOR: Critically evaluate sample sizes, experimental controls, potential biases, and limitations when assigning a rigor score (0-100).
+3. CONTRADICTION SENSITIVITY: Actively surface where two or more sources disagree on metrics, outcomes, or causal mechanisms.
+4. CITATION PRECISION: Always reference sources using their exact provided Source ID and Title.
+5. STRICT JSON OUTPUT: Always adhere 100% to the requested JSON schema with zero markdown wrappers outside the JSON object.
+15. Detailed AI Prompts (with required JSON Schemas)
+Prompt 1: Single Source Ingestion & Claim Extraction (analyzeSourceDocument)
+Input: Workspace Research Question, Source Title, Authors, Source Type, and Document Text (safely truncated to 25,000 characters).
+
+Prompt Template:
+
+Plaintext
+Analyze the following research source within the context of the primary research question: "{{research_question}}".
+Source Metadata: Title: "{{title}}", Authors: "{{authors}}", Type: "{{source_type}}".
+Source Content:
+"""
+{{raw_content}}
+"""
+Extract a comprehensive executive summary, evaluate its methodological rigor (0-100) with justification, list 4-7 key topic tags, and extract 4-8 atomic, verifiable claims categorized as 'empirical_finding', 'statistic', 'methodology', 'limitation', or 'hypothesis'.
+Required responseSchema:
+
+JavaScript
+const sourceAnalysisSchema = {
+  type: Type.OBJECT,
+  properties: {
+    ai_summary: { type: Type.STRING, description: "3-4 sentence rigorous executive summary of the source" },
+    methodology_notes: { type: Type.STRING, description: "Analysis of study design, sample size, data collection, or analytical framework" },
+    rigor_score: { type: Type.INTEGER, description: "Score from 0 to 100 assessing empirical evidence quality and methodological soundness" },
+    rigor_justification: { type: Type.STRING, description: "Concise explanation for the assigned rigor score" },
+    key_topics: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "4 to 7 domain-specific keywords or entities"
+    },
+    extracted_claims: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          claim_text: { type: Type.STRING, description: "Clear, standalone statement of the finding, statistic, or limitation" },
+          claim_category: {
+            type: Type.STRING,
+            enum: ["empirical_finding", "statistic", "methodology", "limitation", "hypothesis"]
+          },
+          supporting_quote: { type: Type.STRING, description: "Direct verbatim excerpt or close reference from the text" },
+          confidence_level: { type: Type.STRING, enum: ["high", "medium", "low"] }
+        },
+        required: ["claim_text", "claim_category", "supporting_quote", "confidence_level"]
+      }
+    }
+  },
+  required: ["ai_summary", "methodology_notes", "rigor_score", "rigor_justification", "key_topics", "extracted_claims"]
+};
+Prompt 2: Multi-Document Cross-Source Synthesis (generateCrossSourceSynthesis)
+Input: Workspace Research Question, Working Hypothesis, Synthesis Mode (systematic_review, contradiction_audit, decision_brief, gap_analysis), and formatted array of Selected Sources (with IDs, Titles, Authors, Rigor Scores, Summaries, and Extracted Claims).
+
+Required responseSchema:
+
+JavaScript
+const synthesisReportSchema = {
+  type: Type.OBJECT,
+  properties: {
+    executive_summary: { type: Type.STRING, description: "Multi-paragraph synthesis directly addressing the workspace research question and hypothesis" },
+    overall_evidence_strength: {
+      type: Type.STRING,
+      enum: ["Strong Consensus", "Moderate Evidence", "Mixed / Contested", "Preliminary / Insufficient"]
+    },
+    consensus_themes: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          theme_title: { type: Type.STRING },
+          synthesis_statement: { type: Type.STRING },
+          supporting_source_titles: { type: Type.ARRAY, items: { type: Type.STRING } }
+        },
+        required: ["theme_title", "synthesis_statement", "supporting_source_titles"]
+      }
+    },
+    contradictions: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          topic: { type: Type.STRING },
+          conflicting_positions: { type: Type.STRING, description: "Detailed breakdown of how Source A conflicts with Source B" },
+          methodological_reason: { type: Type.STRING, description: "Why this discrepancy likely occurred (e.g., sample size, timeframe, definition variance)" },
+          sources_involved: { type: Type.ARRAY, items: { type: Type.STRING } }
+        },
+        required: ["topic", "conflicting_positions", "methodological_reason", "sources_involved"]
+      }
+    },
+    research_gaps: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          gap_title: { type: Type.STRING },
+          description: { type: Type.STRING },
+          suggested_next_study: { type: Type.STRING }
+        },
+        required: ["gap_title", "description", "suggested_next_study"]
+      }
+    },
+    decision_recommendations: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          action_title: { type: Type.STRING },
+          recommendation: { type: Type.STRING },
+          evidence_confidence: { type: Type.STRING, enum: ["High", "Medium", "Low"] },
+          risk_if_ignored: { type: Type.STRING }
+        },
+        required: ["action_title", "recommendation", "evidence_confidence", "risk_if_ignored"]
+      }
+    }
+  },
+  required: [
+    "executive_summary",
+    "overall_evidence_strength",
+    "consensus_themes",
+    "contradictions",
+    "research_gaps",
+    "decision_recommendations"
+  ]
+};
+Prompt 3: Grounded Research Copilot Q&A (askResearchCopilot)
+Input: Workspace Question, All Workspace Sources & Claims Context, Recent Chat History, and User's Question.
+
+Required responseSchema:
+
+JavaScript
+const copilotResponseSchema = {
+  type: Type.OBJECT,
+  properties: {
+    answer_markdown: {
+      type: Type.STRING,
+      description: "Comprehensive, evidence-backed response citing sources inline by title"
+    },
+    citations: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          source_id: { type: Type.STRING },
+          source_title: { type: Type.STRING },
+          relevance_note: { type: Type.STRING },
+          key_excerpt: { type: Type.STRING }
+        },
+        required: ["source_id", "source_title", "relevance_note", "key_excerpt"]
+      }
+    },
+    follow_up_questions: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "3 insightful follow-up research questions the user can ask next"
+    }
+  },
+  required: ["answer_markdown", "citations", "follow_up_questions"]
+};
+16. Zod Validation Requirements
+Create a dedicated server/src/validators/schemas.js module and validation helper that validates all incoming requests:
+
+registerSchema: full_name (min 2 chars), email (valid email), password (min 6 chars), institution (optional), research_role (optional).
+
+loginSchema: email (valid email), password (min 1 char).
+
+createWorkspaceSchema: title (min 5, max 200), domain (enum of the 6 target domains), research_question (min 10 chars), working_hypothesis (optional), default_synthesis_mode (enum of 4 modes).
+
+ingestSourceSchema: title (min 3 chars), authors (optional), publication_year (optional coercible number between 1900 and 2030), source_type (enum of 4 source types), raw_content (optional if file buffer is present, otherwise min 40 chars).
+
+synthesizeRequestSchema: source_ids (array of UUID strings, min length 2), synthesis_mode (enum of 4 modes), title (optional string).
+
+copilotQuestionSchema: question (min 5, max 2000 chars).
+
+17. Frontend Components List
+Build modular, reusable, and visually polished React components inside client/src/components/:
+
+Navbar.jsx — Sticky top navigation bar with brand logo, Dashboard link, Synthesis Library link, active user institution badge, and Logout button.
+
+ProtectedRoute.jsx — Route guard verifying JWT auth state and rendering a clean loading spinner while checking session.
+
+WorkspaceCard.jsx — Displays workspace title, domain badge, primary research question, source count, claims count, syntheses count, and action link.
+
+SourceUploadModal.jsx — Dual-mode ingestion modal: Tab A for drag-and-drop .pdf / .txt / .md file upload via Multer (multipart/form-data), and Tab B for pasting raw study text/abstracts + metadata, plus a "Load Sample Research Study" button for instant 1-click testing.
+
+SourceCard.jsx — Displays source title, authors, publication year, source type badge, color-coded Methodology Rigor Score Badge (Emerald >=75, Amber 50–74, Rose <50), AI executive summary, methodology critique, topic tags, and expandable atomic claims drawer.
+
+ClaimsTable.jsx — Filterable and searchable matrix of all atomic claims across the workspace, showing claim category pill, confidence level, verbatim supporting quote, and source attribution.
+
+SynthesisStudio.jsx — Interactive studio to select 2+ workspace sources via checkboxes, choose the synthesis_mode lens, trigger AI synthesis, and render the full Synthesis Report View (Executive Literature Summary, Evidence Strength Banner, Consensus Themes Grid, Contradiction Alert Cards, Research Gaps, and Decision Matrix).
+
+CopilotChat.jsx — Split-pane RAG research assistant with message history, clickable citation cards displaying source excerpts, and 1-click follow-up question chips.
+
+MarkdownExporter.jsx — Utility button that exports any synthesis report into a formatted .md file download or triggers window.print().
+
+18. Security Requirements
+Password Security: Never store plaintext passwords. Always hash with bcryptjs (saltRounds = 10).
+
+JWT Authentication: Sign tokens using process.env.JWT_SECRET and verify via an authenticateToken Express middleware on all protected /api/* routes.
+
+File Upload Hardening: Configure Multer with limits: { fileSize: 10 * 1024 * 1024 } (10MB max) and a fileFilter allowing only .pdf, .txt, and .md files.
+
+Input Sanitization & Validation: Validate all request bodies with Zod before executing database queries or Gemini API calls. Return structured 400 Bad Request JSON with clear error messages.
+
+Rate Limiting & Headers: Apply helmet() and express-rate-limit (150 requests per 15 minutes on general API routes, 30 requests per 15 minutes on AI generation routes).
+
+19. Environment Variables Template
+Generate .env.example files for both backend and frontend:
+
+Backend (server/.env.example)
+Code snippet
+PORT=5000
+NODE_ENV=development
+DATABASE_URL=postgresql://username:password@localhost:5432/scholarmesh_db
+JWT_SECRET=super_secret_jwt_signing_key_change_in_production
+GEMINI_API_KEY=your_google_gemini_api_key_here
+CLIENT_URL=http://localhost:5173
+Frontend (client/.env.example)
+Code snippet
+VITE_API_BASE_URL=http://localhost:5000/api
+20. Suggested Folder Structure
+Plaintext
+scholarmesh-ai/
+├── README.md
+├── package.json
+├── server/
+│   ├── package.json
+│   ├── .env.example
+│   └── src/
+│       ├── index.js                 # Express app entry point & server startup
+│       ├── config/
+│       │   └── db.js                # PostgreSQL Pool & auto-migration runner
+│       ├── db/
+│       │   ├── init.sql             # Complete PostgreSQL schema
+│       │   └── seed.js              # Demo user + pre-populated sample workspace seeder
+│       ├── middleware/
+│       │   ├── authMiddleware.js    # JWT verification middleware
+│       │   ├── uploadMiddleware.js  # Multer memoryStorage configuration
+│       │   └── errorHandler.js      # Centralized Express error handler
+│       ├── validators/
+│       │   └── schemas.js           # All Zod validation schemas
+│       ├── services/
+│       │   ├── geminiService.js     # @google/genai structured output calls
+│       │   └── pdfParserService.js  # PDF & text buffer extraction service
+│       └── routes/
+│           ├── authRoutes.js
+│           ├── workspaceRoutes.js
+│           ├── sourceRoutes.js
+│           ├── synthesisRoutes.js
+│           └── copilotRoutes.js
+└── client/
+    ├── package.json
+    ├── vite.config.js
+    ├── tailwind.config.js
+    ├── postcss.config.js
+    ├── index.html
+    ├── .env.example
+    └── src/
+        ├── main.jsx
+        ├── App.jsx
+        ├── index.css
+        ├── api/
+        │   └── axiosClient.js       # Axios instance with JWT interceptor
+        ├── context/
+        │   └── AuthContext.jsx      # User authentication & session state
+        ├── components/
+        │   ├── Navbar.jsx
+        │   ├── ProtectedRoute.jsx
+        │   ├── WorkspaceCard.jsx
+        │   ├── SourceUploadModal.jsx
+        │   ├── SourceCard.jsx
+        │   ├── ClaimsTable.jsx
+        │   ├── SynthesisStudio.jsx
+        │   ├── CopilotChat.jsx
+        │   └── MarkdownExporter.jsx
+        └── pages/
+            ├── LandingPage.jsx
+            ├── LoginPage.jsx
+            ├── RegisterPage.jsx
+            ├── DashboardPage.jsx
+            ├── CreateWorkspacePage.jsx
+            ├── WorkspaceDetailPage.jsx
+            └── SavedSynthesesPage.jsx
+21. Implementation Phases
+Execute the build in the following sequential order without pausing:
+
+Phase 1: Project Scaffolding & Database Layer: Initialize root, server/, and client/ configurations. Configure PostgreSQL connection pool (db.js), write init.sql, and create an automatic database initialization + demo data seeding script (seed.js) so a demo researcher account (demo@scholarmesh.ai / DemoPass123!) and a rich pre-populated multi-source workspace (with 3 conflicting research studies, extracted claims, and a sample synthesis report) exist out of the box.
+
+Phase 2: Backend Security, Auth & Zod Validators: Implement schemas.js, authMiddleware.js, uploadMiddleware.js, and /api/auth routes with bcryptjs and jsonwebtoken.
+
+Phase 3: Google Gemini AI Service & Document Extraction: Build pdfParserService.js and geminiService.js using @google/genai (gemini-2.5-flash) with the 3 strict JSON schemas (sourceAnalysisSchema, synthesisReportSchema, copilotResponseSchema).
+
+Phase 4: Core Research API Routes: Implement workspaceRoutes.js, sourceRoutes.js, synthesisRoutes.js, and copilotRoutes.js with strict user_id tenant ownership verification.
+
+Phase 5: Frontend Architecture & Auth Flow: Set up Vite + React Router + Tailwind CSS + AuthContext.jsx + axiosClient.js. Build LandingPage, LoginPage (with 1-click Demo Researcher Login), and RegisterPage.
+
+Phase 6: Workspace Command Center & AI Interfaces: Build DashboardPage, CreateWorkspacePage, WorkspaceDetailPage (with all 4 interactive tabs: Corpus & Upload, Claim Explorer, Cross-Source Synthesis Studio, and Grounded Research Copilot), and SavedSynthesesPage.
+
+Phase 7: Documentation & Deployment Readiness: Generate a comprehensive root README.md containing the Problem Statement, Solution Description, AI Architecture Overview, Local Setup Instructions, Environment Variables, and Step-by-Step Deployment Guide (Vercel/Netlify for Frontend, Render/Railway/Fly.io for Backend, Supabase/Neon/Railway for PostgreSQL).
+
+22. Acceptance Criteria
+Before completing your output, verify that all of the following criteria are met:
+
+[ ] Zero Placeholders: Every single file contains 100% complete, runnable code with no omitted functions or comments like // rest of code here.
+
+[ ] Real File Upload + Text Parsing: Users can upload .pdf, .txt, or .md files via Multer OR paste raw study text, plus use a "Load Sample Research Study" button for instant testing.
+
+[ ] Strict Backend AI Key Isolation: @google/genai is called exclusively on the Express backend using process.env.GEMINI_API_KEY.
+
+[ ] Structured JSON Outputs: All 3 AI workflows (Source Claim Extraction, Cross-Source Synthesis, and Grounded Copilot Q&A) enforce Gemini responseSchema and render rich interactive UI components rather than unformatted text walls.
+
+[ ] Tenant Data Isolation: Users can only view, query, delete, or synthesize workspaces and sources they own.
+
+[ ] Demo Account Ready: Clicking "1-Click Demo Login" on /login immediately logs into the seeded researcher account (demo@scholarmesh.ai) with pre-populated research sources, claims, and synthesis reports ready to explore and demo.
+
+23. Final Instruction to Coding Agent
+Begin building ScholarMesh AI immediately. Follow the implementation phases step by step, outputting every file's complete path and full code implementation. Do not skip any backend routes, database initialization scripts, seed data, Zod schemas, Gemini service methods, or React components. Ensure the application runs cleanly out of the box.

@@ -1,0 +1,6 @@
+{
+  "name": "ScholarMesh AI",
+  "description": "Multi-Source Research Synthesis, Evidence Discovery, and Contradiction Detection Platform powered by Google Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
